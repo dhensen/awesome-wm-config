@@ -10,6 +10,7 @@ local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
+local vicious = require("vicious")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -56,7 +57,7 @@ theme.font = "sans 22"
 -- This is used later as the default terminal and editor to run.
 terminal = "xfce4-terminal"
 editor = os.getenv("EDITOR") or "vim"
-editor_cmd = terminal .. " -e " .. editor
+editor_cmd = terminal .. " -x " .. editor
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -103,8 +104,8 @@ end
 -- {{{ Menu
 -- Create a laucher widget and a main menu
 myawesomemenu = {
-   { "manual", terminal .. " -e 'man awesome'" },
-   { "edit config", editor_cmd .. " " .. awesome.conffile },
+   { "manual", terminal .. " -x man awesome" },
+   { "edit config", editor_cmd .. " " .. awful.util.getdir("config") .. "/rc.lua" },
    { "restart", awesome.restart },
    { "quit", awesome.quit }
 }
@@ -124,6 +125,19 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- {{{ Wibox
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
+mytextclock:set_font(theme.font)
+
+memwidget = wibox.widget.textbox()
+memwidget:set_font(theme.font)
+vicious.register(memwidget, vicious.widgets.mem, "MEM: $1% ($2MB/$3MB) " ,13)
+
+cpuwidget = wibox.widget.textbox()
+vicious.register(cpuwidget, vicious.widgets.cpu, "CPU: $1% ")
+cpuwidget:set_font(theme.font)
+
+batwidget = wibox.widget.textbox()
+vicious.register(batwidget, vicious.widgets.bat, "BAT: $2% ", 61, "BAT1")
+batwidget:set_font(theme.font)
 
 -- Create a wibox for each screen and add it
 mywibox = {}
@@ -207,6 +221,9 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
+    right_layout:add(batwidget)
+    right_layout:add(cpuwidget)
+    right_layout:add(memwidget)
     right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
 

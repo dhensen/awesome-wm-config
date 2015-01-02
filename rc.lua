@@ -39,6 +39,19 @@ end
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init("/usr/share/awesome/themes/default/theme.lua")
+-- beautiful.init("/home/dino/.config/awesome/themes/wombat/theme.lua")
+
+-- set the minimum menu height and width when using a High DPI monitor
+theme = beautiful.get()
+-- ensure a minimum height
+if tonumber(theme.menu_height) < 40 then
+	theme.menu_height = "40"
+end
+-- ensure a minimum width
+if tonumber(theme.menu_width) < 200 then
+	theme.menu_width = "200"
+end
+theme.font = "sans 22"
 
 -- This is used later as the default terminal and editor to run.
 terminal = "xfce4-terminal"
@@ -181,6 +194,9 @@ for s = 1, screen.count() do
 
     -- Create the wibox
     mywibox[s] = awful.wibox({ position = "top", screen = s })
+
+    -- adjust the wibox height for High DPI monitor
+    mywibox[s].height = 50
 
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()

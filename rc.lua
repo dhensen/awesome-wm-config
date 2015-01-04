@@ -39,11 +39,12 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init("/usr/share/awesome/themes/default/theme.lua")
+beautiful.init("/home/dino/.config/awesome/themes/default/theme.lua")
 -- beautiful.init("/home/dino/.config/awesome/themes/wombat/theme.lua")
 
 -- set the minimum menu height and width when using a High DPI monitor
 theme = beautiful.get()
+theme.wallpaper_cmd = { "awsetbg /home/dino/pictures/awesome_wp1.jpg" }
 -- ensure a minimum height
 if tonumber(theme.menu_height) < 40 then
 	theme.menu_height = "40"
@@ -52,7 +53,6 @@ end
 if tonumber(theme.menu_width) < 200 then
 	theme.menu_width = "200"
 end
-theme.font = "sans 22"
 
 -- This is used later as the default terminal and editor to run.
 terminal = "xfce4-terminal"
@@ -125,19 +125,15 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- {{{ Wibox
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
-mytextclock:set_font(theme.font)
 
 memwidget = wibox.widget.textbox()
-memwidget:set_font(theme.font)
 vicious.register(memwidget, vicious.widgets.mem, "MEM: $1% ($2MB/$3MB) " ,13)
 
 cpuwidget = wibox.widget.textbox()
 vicious.register(cpuwidget, vicious.widgets.cpu, "CPU: $1% ")
-cpuwidget:set_font(theme.font)
 
 batwidget = wibox.widget.textbox()
 vicious.register(batwidget, vicious.widgets.bat, "BAT: $2% ", 61, "BAT1")
-batwidget:set_font(theme.font)
 
 -- Create a wibox for each screen and add it
 mywibox = {}

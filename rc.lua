@@ -44,7 +44,6 @@ end
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init("/home/dino/.config/awesome/themes/default/theme.lua")
--- beautiful.init("/home/dino/.config/awesome/themes/wombat/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvt"
@@ -123,10 +122,10 @@ gray = "#94928F"
 mytextclock = awful.widget.textclock()
 
 memwidget = wibox.widget.textbox()
-vicious.register(memwidget, vicious.widgets.mem, "MEM: $1% ($2MB/$3MB) " ,13)
+vicious.register(memwidget, vicious.widgets.mem, markup(gray, " Mem ") .. "$1% ($2MB/$3MB)" ,13)
 
 cpuwidget = wibox.widget.textbox()
-vicious.register(cpuwidget, vicious.widgets.cpu, "CPU: $1% ")
+vicious.register(cpuwidget, vicious.widgets.cpu, markup(gray, " Cpu ") .. "$1%")
 
 if bat_handle ~= "" then
 	batwidget = lain.widgets.bat({

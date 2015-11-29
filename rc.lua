@@ -11,6 +11,10 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 local vicious = require("vicious")
+local lain    = require("lain")
+
+-- TODO: move this to a config file
+local bat_handle = "BAT0"
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -42,20 +46,8 @@ end
 beautiful.init("/home/dino/.config/awesome/themes/default/theme.lua")
 -- beautiful.init("/home/dino/.config/awesome/themes/wombat/theme.lua")
 
--- set the minimum menu height and width when using a High DPI monitor
-theme = beautiful.get()
-theme.wallpaper_cmd = { "awsetbg /home/dino/pictures/awesome_wp1.jpg" }
--- ensure a minimum height
-if tonumber(theme.menu_height) < 40 then
-	theme.menu_height = "40"
-end
--- ensure a minimum width
-if tonumber(theme.menu_width) < 200 then
-	theme.menu_width = "200"
-end
-
 -- This is used later as the default terminal and editor to run.
-terminal = "xfce4-terminal"
+terminal = "urxvt"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -x " .. editor
 
@@ -69,18 +61,19 @@ modkey = "Mod4"
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
 {
-    awful.layout.suit.floating,
+    lain.layout.uselesstile,
     awful.layout.suit.tile,
-    awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.fair,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.spiral,
+    awful.layout.suit.floating,
+    --awful.layout.suit.tile.left,
+    --awful.layout.suit.tile.bottom,
+    --awful.layout.suit.tile.top,
+    --awful.layout.suit.fair,
+    --awful.layout.suit.fair.horizontal,
+    --awful.layout.suit.spiral,
     awful.layout.suit.spiral.dwindle,
-    awful.layout.suit.max,
-    awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier
+    --awful.layout.suit.max,
+    --awful.layout.suit.max.fullscreen,
+    --awful.layout.suit.magnifier
 }
 -- }}}
 
@@ -97,7 +90,7 @@ end
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[1])
+    tags[s] = awful.tag({ "dev", "web", "shell", 4, 5, 6, 7, 8, 9 }, s, layouts[1])
 end
 -- }}}
 
@@ -124,6 +117,9 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 -- {{{ Wibox
 -- Create a textclock widget
+markup = lain.util.markup
+gray = "#94928F"
+
 mytextclock = awful.widget.textclock()
 
 memwidget = wibox.widget.textbox()
@@ -132,8 +128,32 @@ vicious.register(memwidget, vicious.widgets.mem, "MEM: $1% ($2MB/$3MB) " ,13)
 cpuwidget = wibox.widget.textbox()
 vicious.register(cpuwidget, vicious.widgets.cpu, "CPU: $1% ")
 
-batwidget = wibox.widget.textbox()
-vicious.register(batwidget, vicious.widgets.bat, "BAT: $2% ", 61, "BAT1")
+if bat_handle ~= "" then
+	batwidget = lain.widgets.bat({
+		battery = bat_handle,
+	    settings = function()
+	        bat_perc = bat_now.perc
+	        if bat_perc == "N/A" then bat_perc = "Plug" end
+	        widget:set_markup(markup(gray, " Bat ") .. bat_perc .. " ")
+	    end
+	})
+end
+
+volumewidget = lain.widgets.alsa({
+    timeout = 0.5,
+    card = 0,
+    channel = "Master",
+	settings = function()
+		header = " Vol "
+		vlevel = volume_now.level
+		if volume_now.status == "off" then
+			vlevel = vlevel .. "M "
+		else
+			vlevel = vlevel .. " "
+		end
+		widget:set_markup(markup(gray, header) .. vlevel)
+	end
+})
 
 -- Create a wibox for each screen and add it
 mywibox = {}
@@ -205,9 +225,6 @@ for s = 1, screen.count() do
     -- Create the wibox
     mywibox[s] = awful.wibox({ position = "top", screen = s })
 
-    -- adjust the wibox height for High DPI monitor
-    mywibox[s].height = 50
-
     -- Widgets that are aligned to the left
     local left_layout = wibox.layout.fixed.horizontal()
     left_layout:add(mylauncher)
@@ -218,6 +235,7 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(batwidget)
+    right_layout:add(volumewidget)
     right_layout:add(cpuwidget)
     right_layout:add(memwidget)
     right_layout:add(mytextclock)
@@ -277,6 +295,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit),
+    awful.key({ "Control", "Mod1"  }, "l", function () awful.util.spawn("/usr/bin/sflock") end),
 
     awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
     awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
@@ -404,8 +423,8 @@ awful.rules.rules = {
     { rule = { class = "gimp" },
       properties = { floating = true } },
     -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
+    { rule = { class = "Firefox" },
+      properties = { tag = tags[1][2] } },
 }
 -- }}}
 
@@ -483,30 +502,31 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 -- battery warning
-local function trim(s)
-  return s:find'^%s*$' and '' or s:match'^%s*(.*%S)'
+if bat_handle ~= "" then
+    local function trim(s)
+        return s:find'^%s*$' and '' or s:match'^%s*(.*%S)'
+    end
+
+    local function bat_notification()
+        local f_capacity = assert(io.open("/sys/class/power_supply/" .. bat_handle .. "/capacity", "r"))
+        local f_status = assert(io.open("/sys/class/power_supply/" .. bat_handle .. "/status", "r"))
+        local bat_capacity = tonumber(f_capacity:read("*all"))
+        local bat_status = trim(f_status:read("*all"))
+
+        if (bat_capacity <= 15 and bat_status == "Discharging") then
+            naughty.notify({ title      = "Battery Warning"
+              , text       = "Battery low! " .. bat_capacity .."%" .. " left!"
+              , fg="#ffffff"
+              , bg="#C91C1C"
+              , timeout    = 15
+              , position   = "bottom_right"
+            })
+        end
+    end
+
+    battimer = timer({timeout = 60})
+    battimer:connect_signal("timeout", bat_notification)
+    battimer:start()
 end
-
-local function bat_notification()
-  local f_capacity = assert(io.open("/sys/class/power_supply/BAT1/capacity", "r"))
-  local f_status = assert(io.open("/sys/class/power_supply/BAT1/status", "r"))
-  local bat_capacity = tonumber(f_capacity:read("*all"))
-  local bat_status = trim(f_status:read("*all"))
-
-  if (bat_capacity <= 15 and bat_status == "Discharging") then
-    naughty.notify({ title      = "Battery Warning"
-      , text       = "Battery low! " .. bat_capacity .."%" .. " left!"
-      , fg="#ffffff"
-      , bg="#C91C1C"
-      , timeout    = 15
-      , position   = "bottom_right"
-    })
-  end
-end
-
-battimer = timer({timeout = 60})
-battimer:connect_signal("timeout", bat_notification)
-battimer:start()
-
 -- end here for battery warning
 

@@ -67,17 +67,17 @@ theme.useless_gap_width = 10
 local layouts =
 {
     lain.layout.uselesstile,
-    -- awful.layout.suit.tile,
     lain.layout.termfair,
     awful.layout.suit.floating,
+    awful.layout.suit.max,
+    -- awful.layout.suit.tile,
     -- awful.layout.suit.tile.left,
     -- awful.layout.suit.tile.bottom,
     -- awful.layout.suit.tile.top,
     -- awful.layout.suit.fair,
     -- awful.layout.suit.fair.horizontal,
     -- awful.layout.suit.spiral,
-    awful.layout.suit.spiral.dwindle,
-    --awful.layout.suit.max,
+    -- awful.layout.suit.spiral.dwindle,
     --awful.layout.suit.max.fullscreen,
     --awful.layout.suit.magnifier
 }
@@ -93,10 +93,13 @@ end
 
 -- {{{ Tags
 -- Define a tag table which hold all screen tags.
-tags = {}
+tags = {
+    names = { "dev", "web", "shell", "irc", "music", "misc"},
+    layout = { layouts[4], layouts[4], layouts[1], layouts[4], layouts[1], layouts[1] }
+}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag({ "misc", "dev", "web", "shell", "irc", "music" }, s, layouts[1])
+    tags[s] = awful.tag(tags.names, s, tags.layout)
 end
 -- }}}
 
@@ -104,7 +107,7 @@ end
 -- Create a laucher widget and a main menu
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome" },
-   { "edit config", editor_cmd .. " " .. awful.util.getdir("config") .. "/rc.lua" },
+   { "edit config", editor_cmd .. " " .. awful.util.getdir("config") .. "erc.lua" },
    { "restart", awesome.restart },
    { "quit", awesome.quit }
 }

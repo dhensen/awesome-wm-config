@@ -43,7 +43,8 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init("/home/dino/.config/awesome/themes/default/theme.lua")
+beautiful.init("/home/dino/.config/awesome/themes/dino/theme.lua")
+theme = beautiful.get()
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvt"
@@ -57,18 +58,24 @@ editor_cmd = terminal .. " -x " .. editor
 -- However, you can use another modifier like Mod1, but it may interact with others.
 modkey = "Mod4"
 
+
+lain.layout.termfair.nmaster = 3
+lain.layout.termfair.ncol = 1
+theme.useless_gap_width = 10
+
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
 {
     lain.layout.uselesstile,
-    awful.layout.suit.tile,
+    -- awful.layout.suit.tile,
+    lain.layout.termfair,
     awful.layout.suit.floating,
-    --awful.layout.suit.tile.left,
-    --awful.layout.suit.tile.bottom,
-    --awful.layout.suit.tile.top,
-    --awful.layout.suit.fair,
-    --awful.layout.suit.fair.horizontal,
-    --awful.layout.suit.spiral,
+    -- awful.layout.suit.tile.left,
+    -- awful.layout.suit.tile.bottom,
+    -- awful.layout.suit.tile.top,
+    -- awful.layout.suit.fair,
+    -- awful.layout.suit.fair.horizontal,
+    -- awful.layout.suit.spiral,
     awful.layout.suit.spiral.dwindle,
     --awful.layout.suit.max,
     --awful.layout.suit.max.fullscreen,
@@ -329,7 +336,10 @@ globalkeys = awful.util.table.join(
 
     -- Backlight
     awful.key({}, "XF86MonBrightnessUp", function() awful.util.spawn("xbacklight -inc 5") end),
-    awful.key({}, "XF86MonBrightnessDown", function() awful.util.spawn("xbacklight -dec 5") end)
+    awful.key({}, "XF86MonBrightnessDown", function() awful.util.spawn("xbacklight -dec 5") end),
+
+    -- slock
+    awful.key({ "Control", "Mod1" }, "l", function() awful.util.spawn("slock") end)
 )
 
 clientkeys = awful.util.table.join(

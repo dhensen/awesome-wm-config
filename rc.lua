@@ -15,6 +15,7 @@ local lain    = require("lain")
 
 -- TODO: move this to a config file
 local bat_handle = "BAT0"
+local sound_card_nr = 1
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -140,7 +141,7 @@ end
 
 volumewidget = lain.widgets.alsa({
     timeout = 0.5,
-    card = 0,
+    card = sound_card_nr,
     channel = "Master",
 	settings = function()
 		header = " Vol "

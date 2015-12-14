@@ -13,9 +13,8 @@ local menubar = require("menubar")
 local vicious = require("vicious")
 local lain    = require("lain")
 
--- TODO: move this to a config file
-local bat_handle = "BAT0"
-local sound_card_nr = 1
+-- Copy config.lua.dist on first use 
+local config = require("config")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -128,9 +127,9 @@ vicious.register(memwidget, vicious.widgets.mem, markup(gray, " Mem ") .. "$1% (
 cpuwidget = wibox.widget.textbox()
 vicious.register(cpuwidget, vicious.widgets.cpu, markup(gray, " Cpu ") .. "$1%")
 
-if bat_handle ~= "" then
+if config.bat_handle ~= "" then
 	batwidget = lain.widgets.bat({
-		battery = bat_handle,
+		battery = config.bat_handle,
 	    settings = function()
 	        bat_perc = bat_now.perc
 	        if bat_perc == "N/A" then bat_perc = "Plug" end
@@ -141,7 +140,7 @@ end
 
 volumewidget = lain.widgets.alsa({
     timeout = 0.5,
-    card = sound_card_nr,
+    card = config.sound_card_nr,
     channel = "Master",
 	settings = function()
 		header = " Vol "
@@ -234,7 +233,7 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    if bat_handle ~= "" then
+    if config.bat_handle ~= "" then
         right_layout:add(batwidget)
     end
     right_layout:add(volumewidget)
@@ -504,14 +503,14 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 -- battery warning
-if bat_handle ~= "" then
+if config.bat_handle ~= "" then
     local function trim(s)
         return s:find'^%s*$' and '' or s:match'^%s*(.*%S)'
     end
 
     local function bat_notification()
-        local f_capacity = assert(io.open("/sys/class/power_supply/" .. bat_handle .. "/capacity", "r"))
-        local f_status = assert(io.open("/sys/class/power_supply/" .. bat_handle .. "/status", "r"))
+        local f_capacity = assert(io.open("/sys/class/power_supply/" .. config.bat_handle .. "/capacity", "r"))
+        local f_status = assert(io.open("/sys/class/power_supply/" .. config.bat_handle .. "/status", "r"))
         local bat_capacity = tonumber(f_capacity:read("*all"))
         local bat_status = trim(f_status:read("*all"))
 

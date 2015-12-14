@@ -1,0 +1,6 @@
+local config = {
+    bat_handle = "BAT0",
+    sound_card_nr = 0
+}
+
+return config

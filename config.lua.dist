@@ -1,6 +1,7 @@
 local config = {
     bat_handle = "BAT0",
-    sound_card_nr = 0
+    sound_card_nr = 0,
+    theme_path = ".config/awesome/themes/default/theme.lua"
 }
 
 return config

@@ -1,3 +1,6 @@
 [submodule "themes"]
 	path = themes
 	url = https://github.com/dhensen/awesome-themes.git
+[submodule "lain"]
+	path = lain
+	url = ./lain
